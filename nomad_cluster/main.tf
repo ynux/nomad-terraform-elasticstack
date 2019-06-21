@@ -94,16 +94,11 @@ module "clients" {
               /opt/nomad/bin/run-nomad --client
               EOF
 
+  vpc_id     = "${data.aws_vpc.default.id}"
+  subnet_ids = "${data.aws_subnet_ids.default.ids}"
+
   allowed_inbound_cidr_blocks = ["0.0.0.0/0"]
   ssh_key_name                = "searchmeetup"
-
-  tags = [
-    {
-      key                 = "Environment"
-      value               = "development"
-      propagate_at_launch = true
-    },
-  ]
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
