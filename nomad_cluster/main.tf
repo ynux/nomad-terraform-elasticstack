@@ -3,17 +3,44 @@
 # only use for demo 
 # ---------------------------------------------------------------------------------------------------------------------
 
+provider "aws" {
+   region = "eu-central-1"
+}
+
+# from .env_vars
+
+variable "vpc_id" {
+    type = string
+}
+
+variable "subnet_ids" {
+    type = list
+}
+
+variable "security_group_id" {
+    type = string
+}
+
+variable "ssh_key_name" {
+    type = string
+}
+
+variable "my_ip" {
+    type = string
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY THE SERVER NODES (consul & nomad)
+# using my fork for terraform 0.12
 # ---------------------------------------------------------------------------------------------------------------------
 
 module "servers" {
-  source = "github.com/hashicorp/terraform-aws-consul//modules/consul-cluster?ref=v0.4.5"
+  source = "github.com/ynux/terraform-aws-consul//modules/consul-cluster?ref=terraform_012"
 
   cluster_name  = "search-meetup"
   cluster_size  = 3
   instance_type = "t2.micro"
-
+  
   # The EC2 Instances will use these tags to automatically discover each other and form a cluster
   cluster_tag_key   = "nomad-example"
   cluster_tag_value = "auto-join"
@@ -32,14 +59,15 @@ module "servers" {
               exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
               
               # These variables are passed in via Terraform template interplation
-              /opt/consul/bin/run-consul --server --cluster-tag-key "${cluster_tag_key}" --cluster-tag-value "${cluster_tag_value}"
-              /opt/nomad/bin/run-nomad --server --num-servers "${num_servers}"
+              /opt/consul/bin/run-consul --server --cluster-tag-key nomad-example --cluster-tag-value "auto-join"
+              /opt/nomad/bin/run-nomad --server --num-servers "3"
               EOF
 
-  allowed_ssh_cidr_blocks = ["0.0.0.0/0"]
+  vpc_id = "${var.vpc_id}"
+  allowed_ssh_cidr_blocks = ["${var.my_ip}/32"]
   allowed_inbound_cidr_blocks = ["0.0.0.0/0"]
-  ssh_key_name                = "searchmeetup"
-
+  ssh_key_name                = "${var.ssh_key_name}"
+  subnet_ids                  = "${var.subnet_ids}"
   tags = [
     {
       key                 = "Environment"
@@ -50,10 +78,8 @@ module "servers" {
 }
 
 module "nomad_security_group_rules" {
-  source = "github.com/hashicorp/terraform-aws-nomad//modules/nomad-security-group-rules?ref=v0.4.5"
-
-  security_group_id = "${module.servers.security_group_id}"
-
+  source = "github.com/ynux/terraform-aws-nomad//modules/nomad-security-group-rules?ref=terraform_012"
+  security_group_id = "${var.security_group_id}"
   allowed_inbound_cidr_blocks = ["0.0.0.0/0"]
 }
 
@@ -62,7 +88,7 @@ module "nomad_security_group_rules" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 module "clients" {
-  source = "github.com/hashicorp/terraform-aws-nomad//modules/nomad-cluster?ref=v0.4.5"
+  source = "github.com/ynux/terraform-aws-nomad//modules/nomad-cluster?ref=terraform_012"
 
   cluster_name  = "search-meetup"
   instance_type = "t2.micro"
@@ -90,15 +116,15 @@ module "clients" {
               exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
               
               # These variables are passed in via Terraform template interplation
-              /opt/consul/bin/run-consul --client --cluster-tag-key "${cluster_tag_key}" --cluster-tag-value "${cluster_tag_value}"
+              /opt/consul/bin/run-consul --client --cluster-tag-key "nomad-example" --cluster-tag-value "auto-join"
               /opt/nomad/bin/run-nomad --client
               EOF
 
-  vpc_id     = "${data.aws_vpc.default.id}"
-  subnet_ids = "${data.aws_subnet_ids.default.ids}"
-
+  subnet_ids                  = "${var.subnet_ids}"
+  vpc_id                      = "${var.vpc_id}"
+  allowed_ssh_cidr_blocks     = ["${var.my_ip}/32"]
   allowed_inbound_cidr_blocks = ["0.0.0.0/0"]
-  ssh_key_name                = "searchmeetup"
+  ssh_key_name                = "${var.ssh_key_name}"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -108,7 +134,7 @@ module "clients" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 module "consul_iam_policies" {
-  source = "github.com/hashicorp/terraform-aws-consul//modules/consul-iam-policies?ref=v0.3.1"
+  source = "github.com/ynux/terraform-aws-consul//modules/consul-iam-policies?ref=terraform_012"
 
   iam_role_id = "${module.clients.iam_role_id}"
 }
@@ -133,10 +159,6 @@ output "iam_role_id_servers" {
   value = "${module.servers.iam_role_id}"
 }
 
-output "security_group_id_servers" {
-  value = "${module.servers.security_group_id}"
-}
-
 output "num_clients" {
   value = "${module.clients.cluster_size}"
 }
@@ -157,18 +179,5 @@ output "iam_role_id_clients" {
   value = "${module.clients.iam_role_id}"
 }
 
-output "security_group_id_clients" {
-  value = "${module.clients.security_group_id}"
-}
 
-output "aws_region" {
-  value = "${data.aws_region.current.name}"
-}
 
-output "nomad_servers_cluster_tag_key" {
-  value = "${module.servers.cluster_tag_key}"
-}
-
-output "nomad_servers_cluster_tag_value" {
-  value = "${module.servers.cluster_tag_value}"
-}
