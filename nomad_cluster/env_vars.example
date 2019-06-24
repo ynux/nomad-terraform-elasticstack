@@ -2,3 +2,5 @@
 export TF_VAR_vpc_id = "vpc-9outof8"
 export TF_VAR_security_group_id="sg-xyz"
 export TF_VAR_ssh_key_name="xyz"
+export TF_VAR_subnet_ids='["subnet-012","subnet-abd","subnet-xyz"]'
+
