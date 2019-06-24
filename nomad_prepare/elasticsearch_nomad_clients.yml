@@ -1,0 +1,34 @@
+---
+- hosts: elasticsearch_nomad_clients
+  become: true
+  tasks:
+  - name: set nomad node_class to elasticsearch
+    lineinfile:
+      path: /opt/nomad/config/default.hcl
+      insertafter: '^  enabled = true$'
+      line: '  node_class="elasticsearch"'
+    register: node_class_set
+    notify: Restart nomad
+  - name: Install Elasticsearch, but don't start it
+    import_role:
+      name: elastic.elasticsearch
+    vars:
+      es_data_dirs:
+        - "/opt/elasticsearch/data"
+      es_log_dir: "/var/log"
+      es_config:
+        cluster.name: "searchmeetup-munich"
+        discovery.seed_hosts: "localhost:9301"
+      es_heap_size: 0.5g
+      es_start_service: false
+  - name: create data dir
+    file:
+      path: /opt/elasticsearch/data
+      state: directory
+      mode: '0755'
+      owner: elasticsearch
+  handlers:
+    - name: Restart nomad
+      supervisorctl:
+        name: nomad
+        state: restarted

@@ -1,0 +1,13 @@
+---
+- hosts: nomad_clients
+  tasks:
+  - name: verify that three nomad nodes have class elasticsearch
+    shell: nomad node status -verbose -json | jq '.[].NodeClass' | grep -c elasticsearch
+    register: num_nodes_elasticsearch_class
+    failed_when: num_nodes_elasticsearch_class.stdout != "3" 
+    run_once: true
+
+  - name: Number of nodes in elasticsearch node class
+    debug: 
+      var: num_nodes_elasticsearch_class.stdout
+    run_once: true
