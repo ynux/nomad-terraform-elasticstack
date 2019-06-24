@@ -1,0 +1,15 @@
+[nomad_clients]
+nnn.nnn.nnn.nnn
+[nomad_clients:children]
+elasticsearch_nomad_clients
+
+[elasticsearch_nomad_clients]
+nnn.nnn.nnn.nnn
+nnn.nnn.nnn.nnn
+nnn.nnn.nnn.nnn
+
+[nomad_servers]
+nnn.nnn.nnn.nnn
+nnn.nnn.nnn.nnn
+nnn.nnn.nnn.nnn
+

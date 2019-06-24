@@ -1,0 +1,29 @@
+---
+- hosts: nomad_clients
+  become: true
+  tasks:
+  - name: installing packetbeat
+    import_role:
+      name: elastic.beats
+    vars:
+      beat: filebeat
+      beat_conf: 
+        filebeat.inputs: 
+          - type: log
+            enabled: true
+            paths:
+              -  /var/log/*.log
+              -  /var/log/syslog
+              -  /var/log/supervisor/*.log
+              -  /var/log/elasticsearch/*.log
+      logging_conf:
+        level: info
+        to_files: true
+        files: 
+          path: /var/log
+          name: filebeat.log
+          keepfiles: 7
+      output_conf: 
+        file:
+          path: "/tmp/filebeat"
+

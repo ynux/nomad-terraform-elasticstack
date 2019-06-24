@@ -1,0 +1,17 @@
+Jun 24 08:14:28 cloud-init[2738]: util.py[WARNING]: Failed running /var/lib/cloud/instance/scripts/part-001 [1]
+
+cloud-init.log
+
+Jun 24 08:14:28 cloud-init[2738]: util.py[DEBUG]: Running module scripts-user (<module 'cloudinit.config.cc_scripts_user' from '/usr/lib/python2.7/dist-packages/cloudinit/config/cc_scripts_user.pyc'>) failed
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/dist-packages/cloudinit/stages.py", line 660, in _run_modules
+    cc.run(run_name, mod.handle, func_args, freq=freq)
+  File "/usr/lib/python2.7/dist-packages/cloudinit/cloud.py", line 63, in run
+    return self._runners.run(name, functor, args, freq, clear_on_fail)
+  File "/usr/lib/python2.7/dist-packages/cloudinit/helpers.py", line 197, in run
+    results = functor(*args)
+  File "/usr/lib/python2.7/dist-packages/cloudinit/config/cc_scripts_user.py", line 38, in handle
+    util.runparts(runparts_path)
+  File "/usr/lib/python2.7/dist-packages/cloudinit/util.py", line 652, in runparts
+    % (len(failed), len(attempted)))
+

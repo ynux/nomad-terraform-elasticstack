@@ -6,8 +6,16 @@
     register: num_nodes_elasticsearch_class
     failed_when: num_nodes_elasticsearch_class.stdout != "3" 
     run_once: true
-
   - name: Number of nodes in elasticsearch node class
     debug: 
       var: num_nodes_elasticsearch_class.stdout
     run_once: true
+
+  - name: Check that the docker driver is healthy
+    shell: nomad node status -verbose -self -json | jq '.Drivers.docker.Healthy'
+    register: docker_driver_healthy
+    failed_when: docker_driver_healthy.stdout != "true"
+  - name: Health of docker driver
+    debug: 
+      var: docker_driver_healthy.stdout
+
