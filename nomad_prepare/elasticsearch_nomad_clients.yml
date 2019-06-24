@@ -27,6 +27,11 @@
       state: directory
       mode: '0755'
       owner: elasticsearch
+  - name: Use java that was bundled with elasticsearch
+    alternatives:
+      name: java
+      link: /usr/bin/java
+      path: /usr/share/elasticsearch/jdk/bin/java
   handlers:
     - name: Restart nomad
       supervisorctl:
