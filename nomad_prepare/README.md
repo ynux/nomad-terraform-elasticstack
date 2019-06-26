@@ -46,3 +46,6 @@ To show that we aren't scared of go templates:
 instead of
 `nomad node status -verbose -json | jq '.[].NodeClass'`
 (jq is installed by packer)
+
+To see that elastic isn't scared of new java versions:
+`ansible nomad_clients -m shell -a "java -version"`
