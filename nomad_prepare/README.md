@@ -36,6 +36,8 @@ Note to self: If you wonder about the path where the role is installed, run `ans
 ```
 ansible-playbook elasticsearch_nomad_clients.yml -i inventory.ini 
 ansible-playbook nomad_clients.yml -i inventory.ini 
+# give nomad a minute to register the task drivers
+sleep 60
 ansible-playbook check_elasticsearch_nomad_clients.yml -i inventory.ini
 ansible-playbook check_nomad_clients.yml -i inventory.ini
 ```
