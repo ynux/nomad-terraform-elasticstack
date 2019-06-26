@@ -21,3 +21,10 @@
     apt:
       name: ['docker-ce','docker-ce-cli','containerd.io']
       state: present
+
+  - name: Copy hcl files over
+    copy:
+      src: files/
+      dest: /home/ubuntu
+      owner: ubuntu
+      group: ubuntu
