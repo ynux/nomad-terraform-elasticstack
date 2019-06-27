@@ -10,7 +10,14 @@
     register: node_class_set
     notify: Restart nomad
   - debug:
-      msg: Lookyhere "{% for host in groups['elasticsearch_nomad_clients'] %} {{ hostvars[host]['ansible_facts'].default_ipv4.address }} {% endfor %}" 
+      msg: Loooookyhere " {{ groups['elasticsearch_nomad_clients'][0] }} " 
+  - name: Increase max file descriptors 
+    pam_limits:
+      domain: "*"
+      limit_type: '-'
+      limit_item: nofile
+      value: 65535
+      comment: elasticsearch prod mode
   - name: Install Elasticsearch, but don't start it
     import_role:
       name: elastic.elasticsearch
@@ -19,10 +26,10 @@
         - "/opt/elasticsearch/data"
       es_log_dir: "/var/log"
       es_config:
+        discovery.seed_providers: file
         node.name: "{{ ansible_nodename }}"
         cluster.name: "searchmeetup-munich"
         network.host: "{{ ansible_default_ipv4.address }}"
-        discovery.seed_hosts: "[ {% for host in groups['elasticsearch_nomad_clients'] %} {{ hostvars[host]['ansible_facts'].default_ipv4.address | regex_replace('([0-9.].*)','\\1,') }} {% endfor %} ]"
       es_heap_size: 1g
       es_start_service: false
   - name: create data dir
