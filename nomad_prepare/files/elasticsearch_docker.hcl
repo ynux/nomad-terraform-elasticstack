@@ -1,5 +1,10 @@
 job "elasticsearch_docker" {
   datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
+  constraint {
+    operator  = "distinct_hosts"
+    value     = "true"
+  }
+
   group "elasticsearch-group-docker" {
     count = 3
     restart {

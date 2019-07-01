@@ -38,9 +38,16 @@ ansible-playbook elasticsearch_nomad_clients.yml -i inventory.ini
 ansible-playbook nomad_clients.yml -i inventory.ini 
 # give nomad a minute to register the task drivers
 sleep 60
-ansible-playbook check_elasticsearch_nomad_clients.yml -i inventory.ini
+ansible-playbook check_elasticsearch_nomad_clients_docker.yml -i inventory.ini
 ansible-playbook check_nomad_clients.yml -i inventory.ini
 ```
+#### Result
+
+The consul service should be visible:
+`dig @<consul server> -p 8600 rest-elasticsearch-docker.service.consul. ANY`
+
+
+
 #### Configuring Elasticsearch: Ansible or Environment Variables + Nomad?
 
 To configure Elasticsearch (path.data, cluster.name, ...), we could:
@@ -62,3 +69,5 @@ To see that elastic isn't scared of new java versions:
 
 Check consul services:
 `curl http://127.0.0.1:8500/v1/catalog/service/intra-elasticsearch | json_pp`
+
+`aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].[PublicIpAddress,PrivateIpAddress]" --output table`

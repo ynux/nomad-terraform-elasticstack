@@ -1,12 +1,13 @@
 job "logstash" {
 
+  datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
   task "logstash" {
     driver = "docker"
 
     env {}
 
     config {
-      image = "docker.elastic.co/logstash/logstash:"
+      image = "docker.elastic.co/logstash/logstash:7.2.0"
     }
 
     resources {

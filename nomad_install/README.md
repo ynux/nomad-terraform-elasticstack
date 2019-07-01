@@ -61,3 +61,9 @@ nomad server members
 nomad node status
 ```
 If all this comes back nicely, proceed to [preparing the nomad cluster](./nomad_prepare)
+
+#### Random notes
+
+consul commands: 
+`dig @<some ip from consul members> -p 8600 <i-sth from nomad node status>.node.consul. ANY`
+
