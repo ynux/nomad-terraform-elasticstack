@@ -49,9 +49,12 @@ Do what makes you happy. I go with ansible.
 #### Random Remarks
 To show that we aren't scared of go templates:
 `nomad node status -verbose -t '{{range .}}{{ .NodeClass }}{{"\n"}}{{end}}'`
-instead of
+`nomad node status -verbose -t '{{range .}}{{ if (eq .NodeClass "elasticsearch") }} {{ .Address }}{{"\n"}}{{end}}{{end}}'`
+
+Achieve the same with jq - installed anyway
 `nomad node status -verbose -json | jq '.[].NodeClass'`
 (jq is installed by packer)
+`nomad node status -verbose -json | jq '.[] | select(.NodeClass == "elasticsearch") | .Address' `
 
 To see that elastic isn't scared of new java versions:
 `ansible nomad_clients -m shell -a "java -version"`

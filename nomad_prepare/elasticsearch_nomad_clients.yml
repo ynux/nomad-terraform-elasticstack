@@ -9,11 +9,14 @@
       line: '  node_class="elasticsearch"'
     register: node_class_set
     notify: Restart nomad
-  - debug:
-      msg: Loooookyhere " {{ groups['elasticsearch_nomad_clients'][0] }} " 
+  - name: make ubuntu 16 use /etc/security/limits.conf
+    lineinfile:
+      path: /etc/pam.d/common-session
+      line: 'session required        pam_limits.so'
+    notify: reboot
   - name: Increase max file descriptors 
     pam_limits:
-      domain: "*"
+      domain: "elasticsearch"
       limit_type: '-'
       limit_item: nofile
       value: 65535
@@ -60,3 +63,6 @@
       supervisorctl:
         name: nomad
         state: restarted
+    - name: reboot
+      reboot:
+

@@ -18,7 +18,7 @@ job "elasticsearch_docker" {
       driver = "docker"
 
       config {
-        image = "docker.elastic.co/elasticsearch/elasticsearch:7.1.1"
+        image = "docker.elastic.co/elasticsearch/elasticsearch-oss:7.2.0"
         network_mode = "host"
 
         port_map {
@@ -27,31 +27,18 @@ job "elasticsearch_docker" {
         }
       }
 
-      template {
-        change_mode = "noop"
-        destination = "config/unicast_hosts.txt"
-        data = <<EOF
-    {{ range service "intra-elasticsearch-docker|any" }}{{ .Address }}:{{ .Port }}
-    {{ end }}
-        EOF
-      }
-
       env {
         "cluster.name" = "search-meetup-munich"
         "network.bind_host"                  = "0.0.0.0"
         "network.publish_host"               = "${NOMAD_IP_elasticsearch_intra}"
-        "discovery.zen.hosts_provider"       = "file"
-        "discovery.zen.minimum_master_nodes" = 2
-        "xpack.security.enabled"             = "false"
-        "xpack.ml.enabled"                   = "false"
-        "xpack.graph.enabled"                = "false"
-        "xpack.watcher.enabled"              = "false"
-        "searchguard.enterprise_modules_enabled" = "false"
+        "discovery.seed_hosts"               = "172.31.45.28"
+        "cluster.initial_master_nodes"       = "[\"172.31.1.182\",\"172.31.45.28\",\"172.31.26.1\"]"
+        "ES_JAVA_OPTS"                       = "-Xms1g -Xmx1g"
       }
 
       resources {
         cpu = 50	
-        memory = 512
+        memory = 1500 
         network {
           mbits = 50
           port "elasticsearch_rest" { static = 9200 }
@@ -82,5 +69,4 @@ job "elasticsearch_docker" {
     }
   }
 }
-
 
