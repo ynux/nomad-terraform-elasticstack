@@ -1,0 +1,40 @@
+--- 
+- hosts: elasticsearch_nomad_clients
+  become: true
+  tasks:
+  - name: set nomad node_class to elasticsearch
+    lineinfile:
+      path: /opt/nomad/config/default.hcl
+      insertafter: '^  enabled = true$'
+      line: '  node_class="elasticsearch"'
+    register: node_class_set
+    notify: Restart nomad
+  - name: create data dir
+    file:
+      path: /opt/elasticsearch/data
+      state: directory
+      mode: '0755'
+  - name: make ubuntu 16 use /etc/security/limits.conf
+    lineinfile:
+      path: /etc/pam.d/common-session
+      line: 'session required        pam_limits.so'
+    notify: reboot
+  - name: Increase max file descriptors
+    pam_limits:
+      domain: "elasticsearch"
+      limit_type: '-'
+      limit_item: nofile
+      value: 65535
+      comment: elasticsearch prod mode
+  - name: increase mmaps counts, https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html  
+    sysctl:
+      name: vm.max_map_count
+      value: 262144
+  handlers:
+    - name: Restart nomad
+      supervisorctl:
+        name: nomad
+        state: restarted
+    - name: reboot
+      reboot:
+

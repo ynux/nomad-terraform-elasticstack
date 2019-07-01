@@ -51,10 +51,9 @@ To show that we aren't scared of go templates:
 `nomad node status -verbose -t '{{range .}}{{ .NodeClass }}{{"\n"}}{{end}}'`
 `nomad node status -verbose -t '{{range .}}{{ if (eq .NodeClass "elasticsearch") }} {{ .Address }}{{"\n"}}{{end}}{{end}}'`
 
-Achieve the same with jq - installed anyway
+Achieve the same with jq - installed anyway (jq is installed by packer)
 `nomad node status -verbose -json | jq '.[].NodeClass'`
-(jq is installed by packer)
-`nomad node status -verbose -json | jq '.[] | select(.NodeClass == "elasticsearch") | .Address' `
+nomad node status -verbose -json | jq '.[] | select(.NodeClass == "elasticsearch") | select(.Status == "ready") | .Address'`
 
 To see that elastic isn't scared of new java versions:
 `ansible nomad_clients -m shell -a "java -version"`
