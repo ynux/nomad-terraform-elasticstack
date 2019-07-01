@@ -50,7 +50,7 @@ Do what makes you happy. I go with ansible.
 To show that we aren't scared of go templates:
 `nomad node status -verbose -t '{{range .}}{{ .NodeClass }}{{"\n"}}{{end}}'`
 `nomad node status -verbose -t '{{range .}}{{ if (eq .NodeClass "elasticsearch") }} {{ .Address }}{{"\n"}}{{end}}{{end}}'`
-
+`nomad node status -verbose -t '{{range .}}{{ if and (eq .NodeClass "elasticsearch") (eq .Status "ready") }} {{ .Address }}{{"\n"}}{{end}}{{end}}'`
 Achieve the same with jq - installed anyway (jq is installed by packer)
 `nomad node status -verbose -json | jq '.[].NodeClass'`
 nomad node status -verbose -json | jq '.[] | select(.NodeClass == "elasticsearch") | select(.Status == "ready") | .Address'`
