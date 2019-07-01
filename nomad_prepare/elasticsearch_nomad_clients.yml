@@ -1,4 +1,4 @@
----
+--- 
 - hosts: elasticsearch_nomad_clients
   become: true
   tasks:
@@ -32,6 +32,18 @@
         network.host: "{{ ansible_default_ipv4.address }}"
       es_heap_size: 1g
       es_start_service: false
+  - name: Create discovery seed file
+    copy:
+      content: " {% for host in groups['elasticsearch_nomad_clients'] %} {{ hostvars[host]['ansible_facts'].default_ipv4.address | regex_replace('([0-9.].*)','\\1\n') }} {% endfor %}  "
+      dest: /etc/elasticsearch/unicast_hosts.txt
+      owner: elasticsearch
+    register: ip_addresses_present
+  - name: Remove leading blanks in seed file
+    replace:
+      path: /etc/elasticsearch/unicast_hosts.txt
+      regexp: '^  (.[0-9.])'
+      replace: '\1'
+
   - name: create data dir
     file:
       path: /opt/elasticsearch/data

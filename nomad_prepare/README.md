@@ -39,6 +39,12 @@ ansible-playbook nomad_clients.yml -i inventory.ini
 ansible-playbook check_elasticsearch_nomad_clients.yml -i inventory.ini
 ansible-playbook check_nomad_clients.yml -i inventory.ini
 ```
+#### Configuring Elasticsearch: Ansible or Environment Variables + Nomad?
+
+To configure Elasticsearch (path.data, cluster.name, ...), we could:
+* Put it into ansible yml
+* Put env vars into the ansible yml, and fill them in the nomad hcl file [elasticsearch documentation: environemnt vars](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html#_environment_variable_substitution)
+Do what makes you happy. I go with ansible.
 
 #### Random Remarks
 To show that we aren't scared of go templates:
@@ -49,3 +55,6 @@ instead of
 
 To see that elastic isn't scared of new java versions:
 `ansible nomad_clients -m shell -a "java -version"`
+
+Check consul services:
+`curl http://127.0.0.1:8500/v1/catalog/service/intra-elasticsearch | json_pp`
