@@ -25,7 +25,7 @@ job "elasticsearch_java" {
       config {
         class_path = "/usr/share/elasticsearch/jdk/lib/server/:/usr/share/elasticsearch/lib/*"
         class = "org.elasticsearch.bootstrap.Elasticsearch"
-        jvm_options = ["-Xms512m", "-Xmx512m","-XX:+UseConcMarkSweepGC","-XX:CMSInitiatingOccupancyFraction=75","-XX:+UseCMSInitiatingOccupancyOnly","-XX:+AlwaysPreTouch","-server","-Djava.awt.headless=true","-Dfile.encoding=UTF-8","-Djna.nosys=true","-Djdk.io.permissionsUseCanonicalPath=true","-Dio.netty.noUnsafe=true","-Dio.netty.noKeySetOptimization=true","-Dio.netty.recycler.maxCapacityPerThread=0","-Dlog4j.shutdownHookEnabled=false","-Dlog4j2.disable.jmx=true","-Dlog4j.skipJansi=true","-XX:+HeapDumpOnOutOfMemoryError","-Dio.netty.allocator.type=unpooled","-Des.path.home=/usr/share/elasticsearch","-Des.path.conf=/etc/elasticsearch","-Des.distribution.flavor=default","-Des.distribution.type=deb","-Des.bundled_jdk=true","-cp","/usr/share/elasticsearch/lib/*"]
+        jvm_options = ["-Xms512m", "-Xmx512m","-XX:+UseConcMarkSweepGC","-XX:CMSInitiatingOccupancyFraction=75","-XX:+UseCMSInitiatingOccupancyOnly","-XX:+AlwaysPreTouch","-server","-Djava.awt.headless=true","-Dfile.encoding=UTF-8","-Djna.nosys=true","-Djdk.io.permissionsUseCanonicalPath=true","-Dio.netty.noUnsafe=true","-Dio.netty.noKeySetOptimization=true","-Dio.netty.recycler.maxCapacityPerThread=0","-Dlog4j.shutdownHookEnabled=false","-Dlog4j2.disable.jmx=true","-Dlog4j.skipJansi=true","-XX:+HeapDumpOnOutOfMemoryError","-Dio.netty.allocator.type=unpooled","-Des.path.home=/usr/share/elasticsearch","-Des.path.conf=/etc/elasticsearch","-Des.distribution.flavor=default","-Des.distribution.type=deb","-Des.bundled_jdk=true"]
       }
       resources {
         cpu = 50	
@@ -35,6 +35,15 @@ job "elasticsearch_java" {
           port "elasticsearch_rest" { static = 9200 }
           port "elasticsearch_intra" { static = 9300 }
         }
+      }
+
+      template {
+        change_mode = "noop"
+        destination = "suny/unicast_hosts.txt"
+        data = <<EOF
+    {{ range service "intra-elasticsearch-java|any" }}{{ .Address }}:{{ .Port }}
+    {{ end }}
+        EOF
       }
 
       service {

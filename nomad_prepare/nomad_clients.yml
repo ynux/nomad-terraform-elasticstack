@@ -21,7 +21,11 @@
     apt:
       name: ['docker-ce','docker-ce-cli','containerd.io']
       state: present
-
+  - name: Add ubuntu to docker group
+    user:
+      name: ubuntu
+      groups: docker
+      append: yes
   - name: Copy hcl files over
     copy:
       src: files/

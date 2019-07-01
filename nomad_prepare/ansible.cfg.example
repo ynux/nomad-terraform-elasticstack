@@ -2,4 +2,4 @@
 remote_user = ubuntu
 private_key_file = $HOME/.ssh/your_key.pem
 host_key_checking = False
-
+deprecation_warnings=False
