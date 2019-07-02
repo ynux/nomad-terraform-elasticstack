@@ -1,0 +1,16 @@
+actions:
+  1:
+    action: delete_indices
+    options:
+      ignore_empty_list: True
+    filters:
+    - filtertype: age
+      source: name
+      direction: older
+      unit: days
+      unit_count: 2
+      timestring: '%Y.%m.%d'
+    - filtertype: pattern
+      kind: regex
+      value: "filebeat-.*"
+

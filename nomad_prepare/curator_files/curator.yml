@@ -1,0 +1,12 @@
+client:
+  hosts:
+    - 18.185.102.37
+    - 18.195.168.255
+    - 3.120.15.251 
+  port: 9200
+
+logging:
+  loglevel: INFO
+  logfile:
+  logformat: default
+  blacklist: ['elasticsearch','urllib3']
