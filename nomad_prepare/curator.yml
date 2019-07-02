@@ -1,0 +1,24 @@
+---
+# Ansibling https://www.elastic.co/guide/en/elasticsearch/client/curator/current/apt-repository.html
+- hosts: nomad_clients
+  become: true
+  tasks:
+  - name: Add the key (already there because we installed filebeat, only for completeness) 
+    apt_key:
+      url: https://packages.elastic.co/GPG-KEY-elasticsearch
+      state: present
+  - name: Add curator repository
+    apt_repository:
+      filename: curator.list
+      repo: deb [arch=amd64] https://packages.elastic.co/curator/5/debian stable main
+      state: present
+  - name: Install elasticsearch-curator
+    apt:
+      name: ['elasticsearch-curator']
+      state: present
+      update_cache: yes
+  - name: Put config files
+    copy:
+      src: curator_files/
+      dest: /opt/elasticsearch-curator
+
