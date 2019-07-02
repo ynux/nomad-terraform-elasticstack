@@ -30,4 +30,8 @@ to have them discover each other:
 * nomad template
 * plugin - a bit old 
 
+#### What comes then?
 
+* fix mapping of elasticsearch - e.g. `agent.hostname` should be a keyword
+* create visualizations
+* and generally, be kind with each other & save the world

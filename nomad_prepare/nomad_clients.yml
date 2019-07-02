@@ -25,7 +25,7 @@
       append: yes
   - name: Copy hcl files over
     copy:
-      src: files/
+      src: hcl_files/
       dest: /home/ubuntu
       owner: ubuntu
       group: ubuntu
