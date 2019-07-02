@@ -24,6 +24,6 @@
           name: filebeat.log
           keepfiles: 7
       output_conf: 
-        file:
-          path: "/tmp/filebeat"
+        logstash:
+          hosts: ["172.31.15.92:5044"]
 
