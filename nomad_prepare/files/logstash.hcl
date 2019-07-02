@@ -1,13 +1,19 @@
 job "logstash" {
 
   datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
+  constraint {
+    attribute = "${attr.unique.network.ip-address}"
+    value = "172.31.15.92"
+  }
   task "logstash" {
     driver = "docker"
 
-    env {}
 
     config {
       image = "docker.elastic.co/logstash/logstash:7.2.0"
+      volumes = [
+        "/home/ubuntu/pipeline/:/usr/share/logstash/pipeline/"
+      ]
     }
 
     resources {
@@ -17,7 +23,7 @@ job "logstash" {
       network {
         port "beats2logstash" {
           mbits  = 500
-          static = 1704
+          static = 5044
         }
       }
     }
@@ -29,3 +35,4 @@ job "logstash" {
     }
   }
 }
+
