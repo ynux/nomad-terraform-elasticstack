@@ -1,0 +1,18 @@
+---
+# from https://gist.github.com/rbq/886587980894e98b23d0eee2a1d84933
+# which follows https://docs.docker.com/install/linux/docker-ce/ubuntu/
+- hosts: nomad_clients
+  become: true
+  tasks:
+  - name: Copy hcl files over
+    copy:
+      src: hcl_files/
+      dest: /home/ubuntu
+      owner: ubuntu
+      group: ubuntu
+  - name: Copy config files over
+    copy:
+      src: config_files/
+      dest: /home/ubuntu
+      owner: ubuntu
+      group: ubuntu
