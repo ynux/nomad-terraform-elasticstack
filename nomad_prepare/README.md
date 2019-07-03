@@ -31,7 +31,7 @@ Put the path to your key into your [ansible.cfg](./ansible.cfg.example).
 install elastic's beats ansible role with `ansible-galaxy install elastic.beats,7.0.0`
 
 Check your setup with `ansible all -m ping -i inventory.ini`
-Note to self: If you wonder about the path where the role is installed, run `ansible-galaxy info elastic.elasticsearch`.)
+Note to self: If you wonder about the path where the role is installed, run `ansible-galaxy info elastic.beats`.) And the role is not great, e.g. restart when config file changes is broken.
 
 #### Put IP into config and hcl files
 
