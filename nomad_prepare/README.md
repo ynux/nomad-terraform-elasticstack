@@ -67,6 +67,7 @@ ansible-playbook check_nomad_clients.yml
 
 The consul service should be visible:
 `dig @<consul server> -p 8600 rest-elasticsearch-docker.service.consul. ANY`
+`dig @localhost service-kibana.service.consul. ANY`
 
 There should be GUIs reachable from everywhere at `<nomad_consul_server>:4646` `<nomad_consul_server>:8500`
 
@@ -86,3 +87,11 @@ Check consul services:
 `curl http://127.0.0.1:8500/v1/catalog/service/intra-elasticsearch | json_pp`
 
 `aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].[PublicIpAddress,PrivateIpAddress]" --output table`
+
+consul template to return one elasticsearch IP:
+```
+{{ with service "rest-elasticsearch-docker" }}
+{{ with index . 0 }}
+{{ .Address }}{{ end }}{{ end }}
+```
+
