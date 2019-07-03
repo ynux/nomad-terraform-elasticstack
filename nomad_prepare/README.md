@@ -17,10 +17,12 @@ Remarks:
 * We pin 3 elasticsearch nodes to 3 nomad nodes (job constraint)
 * We deploy only 1 logstash instance 
 * For a real life setup, if you want to see the logs when the nomad cluster is gone, install a second filebeat instance to send them to another elastic stack
+* Consul DNS works fine - outside the containers. For now, I put hardcoded IPs into the configurations used by dockered services (in config and hcl files)
 
 #### Prepare ansible
 
-Populate your [inventory.ini](./inventory.ini) with the public IPs of your ec2 instances. Get them e.g. with ```
+Populate your [inventory.ini](./inventory.ini) with the public IPs of your ec2 instances. Get them e.g. with 
+```
 aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text; aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].PublicIpAddress" --output text
 ```
 Put 3 client nodes into the nomad_clients_elasticsearch group.
