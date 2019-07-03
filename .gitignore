@@ -23,3 +23,7 @@ override.tf.json
 
 **/.env_vars/*
 **/ansible.cfg/*
+
+nomad_prepare/hcl_files/kibana.hcl
+nomad_prepare/hcl_files/elasticsearch_docker.hcl
+nomad_prepare/config_files/pipeline/logstash.conf
