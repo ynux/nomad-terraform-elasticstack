@@ -23,14 +23,25 @@ Remarks:
 
 Populate your [inventory.ini](./inventory.ini) with the public IPs of your ec2 instances. Get them e.g. with 
 ```
-aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text; aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].PublicIpAddress" --output text
+aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text
+aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].PublicIpAddress" --output text
 ```
-Put 3 client nodes into the nomad_clients_elasticsearch group.
+Put 3 client nodes into the nomad\_clients\_elasticsearch group.
 Put the path to your key into your [ansible.cfg](./ansible.cfg.example).
 install elastic's beats ansible role with `ansible-galaxy install elastic.beats,7.0.0`
 
 Check your setup with `ansible all -m ping -i inventory.ini`
 Note to self: If you wonder about the path where the role is installed, run `ansible-galaxy info elastic.elasticsearch`.)
+
+#### Put IP into config and hcl files
+
+Unfortunately, i couldn't make consul dns work in the containers. Also, i didn't manage to automatically fill the master ip in the elasticsearch environment. For now, please do it manually:
+* get the IP of one of the elasticserch instance, and replace, e.g. with
+```
+# on mac
+sed -i '' 's/$ES_FIRST_IP/52.28.203.250/' hcl_files/kibana.hcl 
+sed -i '' 's/$ES_FIRST_IP/52.28.203.250/' hcl_files/elasticsearch_docker.hcl
+# on linux use envsubst or sed without the ''
 
 #### Run Playbooks and Check Setup
 

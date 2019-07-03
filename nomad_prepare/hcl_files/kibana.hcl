@@ -13,7 +13,7 @@ job "kibana" {
     }
 
     env {
-       "ELASTICSEARCH_HOSTS" = "http://rest-elasticsearch-docker.service.consul:9200"
+       "ELASTICSEARCH_HOSTS" = "http://52.28.203.250:9200"
     }
 
     resources {

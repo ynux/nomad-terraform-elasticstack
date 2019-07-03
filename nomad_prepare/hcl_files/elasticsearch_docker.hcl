@@ -36,8 +36,8 @@ job "elasticsearch_docker" {
         "cluster.name" = "search-meetup-munich"
         "network.bind_host"                  = "0.0.0.0"
         "network.publish_host"               = "${NOMAD_IP_elasticsearch_intra}"
-        "discovery.seed_hosts"               = "172.31.38.15"
-        "cluster.initial_master_nodes"       = "172.31.38.15"
+        "discovery.seed_hosts"               = "52.28.203.250"
+        "cluster.initial_master_nodes"       = "52.28.203.250"
         "ES_JAVA_OPTS"                       = "-Xms1g -Xmx1g"
       }
 
