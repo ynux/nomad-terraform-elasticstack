@@ -64,7 +64,7 @@ consul members
 nomad server members
 nomad node status
 ```
-If all this comes back nicely, proceed to [preparing the nomad cluster](./nomad_prepare)
+If all this comes back nicely, proceed to [preparing the nomad cluster](../nomad_prepare)
 Or connect to the GUIs of nomad and elasticsearch from outside, using a server's IP and ports 4646 or 8500 respectively.
 
 
