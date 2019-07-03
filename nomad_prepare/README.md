@@ -60,7 +60,6 @@ ansible-playbook consul_dns.yml
 ansible-playbook copy_files.yml
 
 ### Very few checks - I should do more
-ansible-playbook check_elasticsearch_nomad_clients_docker.yml
 ansible-playbook check_nomad_clients.yml
 ```
 #### Result

@@ -8,5 +8,5 @@ The target is a basic elastic stack running on a nomad cluster, collecting logs 
 
 1. Set up a nomad cluster with packer and terraform: [nomad\_install](./nomad_install)
 2. Prepare the cluster with ansible: [nomad\_prepare](./nomad_prepare)
-3. Spin up elasticsearch, logstash, kibana, curator [nomad\_in\_action](./nomad_in_action)
+3. Spin up elasticsearch, logstash, kibana, curator [nomad\_action](./nomad_action)
 3. Protect with SearchGuard
