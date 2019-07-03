@@ -1,10 +1,6 @@
 job "logstash" {
 
   datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
-  constraint {
-    attribute = "${attr.unique.network.ip-address}"
-    value = "172.31.15.92"
-  }
   task "logstash" {
     driver = "docker"
 

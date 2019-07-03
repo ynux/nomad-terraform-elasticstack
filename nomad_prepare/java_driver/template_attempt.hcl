@@ -25,12 +25,13 @@ job "elasticsearch_docker" {
 
     task "run-elasticsearch-docker" {
       driver = "docker"
+
       config {
         image = "docker.elastic.co/elasticsearch/elasticsearch-oss:7.2.0"
-        network_mode = "host"
         volumes = [
           "/opt/elasticsearch/data:/usr/share/elasticsearch/data"
         ]
+        network_mode = "host"
 
         port_map {
           elasticsearch_rest = 9200
@@ -42,11 +43,19 @@ job "elasticsearch_docker" {
         "cluster.name" = "search-meetup-munich"
         "network.bind_host"                  = "0.0.0.0"
         "network.publish_host"               = "${NOMAD_IP_elasticsearch_intra}"
-        "discovery.seed_hosts"               = "172.31.41.218"
-        "cluster.initial_master_nodes"       = "172.31.41.218"
         "ES_JAVA_OPTS"                       = "-Xms1g -Xmx1g"
       }
 
+      template {
+        data = <<EOH
+      discovery.seed_hosts="{{ with service "rest-elasticsearch-docker" }} {{ with index . 0 }} {{ .Address }}{{ end }}{{ end }}"
+      cluster.initial_master_nodes="{{ with service "rest-elasticsearch-docker" }} {{ with index . 0 }} {{ .Address }}{{ end }}{{ end }}"
+      EOH
+      
+        destination = "secrets/elasticip.env"
+        env         = true
+      }
+      
       resources {
         cpu = 50	
         memory = 1500 
@@ -80,4 +89,5 @@ job "elasticsearch_docker" {
     }
   }
 }
+
 

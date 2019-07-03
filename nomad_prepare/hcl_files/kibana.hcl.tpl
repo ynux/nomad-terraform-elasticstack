@@ -13,7 +13,7 @@ job "kibana" {
     }
 
     env {
-       "ELASTICSEARCH_HOSTS" = "http://172.31.41.218:9200"
+       "ELASTICSEARCH_HOSTS" = "http://$ES_FIRST_IP:9200"
     }
 
     resources {

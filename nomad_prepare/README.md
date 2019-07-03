@@ -30,38 +30,38 @@ Put 3 client nodes into the nomad\_clients\_elasticsearch group.
 Put the path to your key into your [ansible.cfg](./ansible.cfg.example).
 install elastic's beats ansible role with `ansible-galaxy install elastic.beats,7.0.0`
 
-Check your setup with `ansible all -m ping -i inventory.ini`
+Check your setup with `ansible all -m ping`
 Note to self: If you wonder about the path where the role is installed, run `ansible-galaxy info elastic.beats`.) And the role is not great, e.g. restart when config file changes is broken.
 
 #### Put IP into config and hcl files
 
 Unfortunately, i couldn't make consul dns work in the containers. Also, i didn't manage to automatically fill the master ip in the elasticsearch environment. For now, please do it manually:
-* get the IP of one of the elasticserch instance, and replace, e.g. with
+* get the private IP of one of the elasticserch instance
+* get another private elasticsearch IP for logstash 
 ```
-# on mac
-sed -i '' 's/$ES_FIRST_IP/52.28.203.250/' hcl_files/kibana.hcl 
-sed -i '' 's/$ES_FIRST_IP/52.28.203.250/' hcl_files/elasticsearch_docker.hcl
-# on linux use envsubst or sed without the ''
-
+sed 's/$ES_FIRST_IP/172.31.41.218/' hcl_files/kibana.hcl.tpl > hcl_files/kibana.hcl
+sed 's/$ES_FIRST_IP/172.31.41.218/' hcl_files/elasticsearch_docker.hcl.tpl > hcl_files/elasticsearch_docker.hcl
+sed 's/$ES_OTHER_IP/172.31.27.73/' config_files/pipeline/logstash.conf.tpl > config_files/pipeline/logstash.conf
+```
 #### Run Playbooks and Check Setup
 
 ```
 # install filebeat on all instances
 ansible-playbook filebeat.yml
 # Install docker on all nomad client nodes
-ansible-playbook nomad_clients.yml -i inventory.ini 
+ansible-playbook nomad_clients.yml
 # Install curator binaries and change chroot
-ansible-playbook curator.yml -i inventory.ini 
+ansible-playbook curator.yml
 # Assign node class "elasticsearch", prepare OS, create data dir
-ansible-playbook elasticsearch_nomad_clients.yml -i inventory.ini 
+ansible-playbook elasticsearch_nomad_clients.yml
 # Integrate consul into DNS
-ansible-playbook consul_dns.yml -i inventory.ini 
+ansible-playbook consul_dns.yml
 # Copy config and nomad job definition files to all client nodes
-ansible-playbook copy_files.yml -i inventory.ini 
+ansible-playbook copy_files.yml
 
 ### Very few checks - I should do more
-ansible-playbook check_elasticsearch_nomad_clients_docker.yml -i inventory.ini
-ansible-playbook check_nomad_clients.yml -i inventory.ini
+ansible-playbook check_elasticsearch_nomad_clients_docker.yml
+ansible-playbook check_nomad_clients.yml
 ```
 #### Result
 
