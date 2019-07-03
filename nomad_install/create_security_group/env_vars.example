@@ -1,3 +1,0 @@
-# save as .env_var and source before running terraform apply
-export TF_VAR_vpc_id="vpc-xxxx"
-export TF_VAR_my_ip="nn.nnn.nnn.nn"
