@@ -27,7 +27,7 @@ filter {
 
 output {
   elasticsearch {
-    hosts => "[http://$ES_OTHER_IP:9200]"
+    hosts => "$ES_OTHER_IP:9200"
     manage_template => false
     index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" 
   }
