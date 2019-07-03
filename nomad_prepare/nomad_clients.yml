@@ -23,33 +23,3 @@
       name: ubuntu
       groups: docker
       append: yes
-  - name: Copy hcl files over
-    copy:
-      src: hcl_files/
-      dest: /home/ubuntu
-      owner: ubuntu
-      group: ubuntu
-  - name: Add /opt/elasticsearch-curator to chroot environment
-    blockinfile:
-      path: /opt/nomad/config/default.hcl
-      block: |
-        client {
-          chroot_env {
-            "/bin"              = "/bin"
-            "/etc"              = "/etc"
-            "/lib"              = "/lib"
-            "/lib32"            = "/lib32" 
-            "/lib64"            = "/lib64"
-            "/run/resolvconf"   = "/run/resolvconf" 
-            "/sbin"             = "/sbin" 
-            "/usr"              = "/usr" 
-            "/opt/elasticsearch-curator" = "/opt/elasticsearch-curator" 
-          }
-        }
-    notify: Restart nomad
-  handlers:
-    - name: Restart nomad
-      supervisorctl:
-        name: nomad
-        state: restarted
-

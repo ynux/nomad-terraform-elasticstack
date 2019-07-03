@@ -2,42 +2,51 @@
 
 ansible 2.8.1
 
-The cluster needs [task drivers](https://www.nomadproject.io/docs/drivers/index.html) on client nodes
+Before we can really start the nomad jobs, the cluster needs [task drivers](https://www.nomadproject.io/docs/drivers/index.html) on client nodes, some system settings, some software and some files.
 
-Plan:
-* elasticsearch: java
-* kibana, curator, logstash: docker
-* curator: exec (python)
-* filebeat not under nomad control
+For the Elastic Stack components, this means:
+* elasticsearch: docker, plus some system prereqs and a data directory
+* kibana, logstash: docker, plus pipeline config
+* curator: exec, periodic job, config, and chroot change
+* filebeat installed directly, not under nomad control, install on nomad clients and servers
+* connect services with consul dns
 
-This means that we prepare in this step:
-* 3 client nodes get disks and java, and node_class=elasticsearch to pin the jobs
-* docker for all clients
-* filebeat for nomad clients and servers
 
 Remarks:
 * I'm not really attaching volumes to the elasticsearch servers
+* We pin 3 elasticsearch nodes to 3 nomad nodes (job constraint)
 * We deploy only 1 logstash instance 
 * For a real life setup, if you want to see the logs when the nomad cluster is gone, install a second filebeat instance to send them to another elastic stack
 
 #### Prepare ansible
 
-Populate your [inventory.ini](./inventory.ini) with the public IPs of your ec2 instances. Get them e.g. with `aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text; aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].PublicIpAddress" --output text`
+Populate your [inventory.ini](./inventory.ini) with the public IPs of your ec2 instances. Get them e.g. with ```
+aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text; aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].PublicIpAddress" --output text
+```
 Put 3 client nodes into the nomad_clients_elasticsearch group.
-
-Put the path to your key into your [ansible.cfg](./ansible.cfg).
+Put the path to your key into your [ansible.cfg](./ansible.cfg.example).
+install elastic's beats ansible role with `ansible-galaxy install elastic.beats,7.0.0`
 
 Check your setup with `ansible all -m ping -i inventory.ini`
-install elastic's elasticsearch ansible role with `ansible-galaxy install elastic.elasticsearch,7.1.1`
 Note to self: If you wonder about the path where the role is installed, run `ansible-galaxy info elastic.elasticsearch`.)
 
 #### Run Playbooks and Check Setup
 
 ```
-ansible-playbook elasticsearch_nomad_clients.yml -i inventory.ini 
+# install filebeat on all instances
+ansible-playbook filebeat.yml
+# Install docker on all nomad client nodes
 ansible-playbook nomad_clients.yml -i inventory.ini 
-# give nomad a minute to register the task drivers
-sleep 60
+# Install curator binaries and change chroot
+ansible-playbook curator.yml -i inventory.ini 
+# Assign node class "elasticsearch", prepare OS, create data dir
+ansible-playbook elasticsearch_nomad_clients.yml -i inventory.ini 
+# Integrate consul into DNS
+ansible-playbook consul_dns.yml -i inventory.ini 
+# Copy config and nomad job definition files to all client nodes
+ansible-playbook copy_files.yml -i inventory.ini 
+
+### Very few checks - I should do more
 ansible-playbook check_elasticsearch_nomad_clients_docker.yml -i inventory.ini
 ansible-playbook check_nomad_clients.yml -i inventory.ini
 ```
@@ -46,14 +55,7 @@ ansible-playbook check_nomad_clients.yml -i inventory.ini
 The consul service should be visible:
 `dig @<consul server> -p 8600 rest-elasticsearch-docker.service.consul. ANY`
 
-
-
-#### Configuring Elasticsearch: Ansible or Environment Variables + Nomad?
-
-To configure Elasticsearch (path.data, cluster.name, ...), we could:
-* Put it into ansible yml
-* Put env vars into the ansible yml, and fill them in the nomad hcl file [elasticsearch documentation: environemnt vars](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html#_environment_variable_substitution)
-Do what makes you happy. I go with ansible.
+There should be GUIs reachable from everywhere at `<nomad_consul_server>:4646` `<nomad_consul_server>:8500`
 
 #### Random Remarks
 To show that we aren't scared of go templates:
