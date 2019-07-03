@@ -1,20 +1,22 @@
 ### Build your Nomad Cluster on AWS
 on your local machine, install:
 
+for nomad and consul cluster installation
 * packer
 * terraform
-* ansible
 * git
+to prepare the job deployments on nomad
+* ansible
 * aws client, or use console
 
 have an aws account, put credentials into environment or $HOME/.aws/credentials file
 
 Versions that worked for me:
-    Packer v1.4.1
-    Terraform v0.12.2
-    + provider.aws v2.16.0
-    git version 2.20.1
-    aws-cli/1.16.171
+  *  Packer v1.4.1
+  *  Terraform v0.12.2
+  *  + provider.aws v2.16.0
+  *  git version 2.20.1
+  *  aws-cli/1.16.171
 
 #### Build amis with nomad and consul 
 
@@ -41,13 +43,15 @@ export TF_VAR_ssh_key_name="xxx"
 export TF_VAR_num_clients=4
 export TF_VAR_ami_id="ami-idnotedinpreviousstep"
 ``` 
+From here on, you may want to use my [fork, branch "elasticsearch"](https://github.com/ynux/terraform-aws-nomad/tree/elasticsearch). Some minor changes were needed for the terraform version 0.12, and some more ports opened for the elastic stack.
+
 Back in the root directory of the git repository terraform-aws-nomad, run 
 ```
 terraform init
+source .env_vars
 terraform plan
 terraform apply
 ```
-If you use terraform > 0.12, some small changes will be required in the terraform nomad and consul modules. See e.g. https://github.com/ynux/terraform-aws-nomad/tree/terraform_012 and https://github.com/ynux/terraform-aws-consul/tree/terraform_012 .
 
 *When you succeed, you will have 7 ec2 instances running, so watch the costs and run `terraform destroy` when you are done*
 
@@ -61,9 +65,6 @@ nomad server members
 nomad node status
 ```
 If all this comes back nicely, proceed to [preparing the nomad cluster](./nomad_prepare)
+Or connect to the GUIs of nomad and elasticsearch from outside, using a server's IP and ports 4646 or 8500 respectively.
 
-#### Random notes
-
-consul commands: 
-`dig @<some ip from consul members> -p 8600 <i-sth from nomad node status>.node.consul. ANY`
 
