@@ -16,6 +16,9 @@
               - /var/log/syslog
               - /var/log/supervisor/*.log
               - /var/log/elasticsearch/*.log
+              - /tmp/nomad/alloc/*/alloc/logs/*
+            processors: 
+              - add_docker_metadata: "~"
       logging_conf:
         level: info
         to_files: true

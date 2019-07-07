@@ -28,7 +28,7 @@ aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" 
 ```
 Put 3 client nodes into the nomad\_clients\_elasticsearch group.
 Put the path to your key into your [ansible.cfg](./ansible.cfg.example).
-install elastic's beats ansible role with `ansible-galaxy install elastic.beats,7.0.0`
+install elastic's beats ansible role with `ansible-galaxy install -r requirements.yml`
 
 Check your setup with `ansible all -m ping`
 Note to self: If you wonder about the path where the role is installed, run `ansible-galaxy info elastic.beats`.) And the role is not great, e.g. restart when config file changes is broken.

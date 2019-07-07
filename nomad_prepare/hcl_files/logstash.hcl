@@ -1,14 +1,14 @@
 job "logstash" {
+  datacenters = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 
-  datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
   task "logstash" {
     driver = "docker"
 
-
     config {
       image = "docker.elastic.co/logstash/logstash-oss:7.2.0"
+
       volumes = [
-        "/home/ubuntu/pipeline/:/usr/share/logstash/pipeline/"
+        "/home/ubuntu/pipeline/:/usr/share/logstash/pipeline/",
       ]
     }
 
@@ -31,4 +31,3 @@ job "logstash" {
     }
   }
 }
-

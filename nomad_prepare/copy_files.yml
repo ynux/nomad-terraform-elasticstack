@@ -10,9 +10,22 @@
       dest: /home/ubuntu
       owner: ubuntu
       group: ubuntu
-  - name: Copy config files over
-    copy:
-      src: config_files/
-      dest: /home/ubuntu
+  - name: hcl templates with IPs
+    template:
+      src: hcl_files/{{ item }}.j2
+      dest: /home/ubuntu/{{ item }}
+      owner: ubuntu
+      group: ubuntu
+    loop: 
+      - elasticsearch_docker.hcl
+      - kibana.hcl
+  - name: Create pipeline config dir for logstash
+    file: 
+      path: /home/ubuntu/pipeline
+      state: directory
+  - name: Logstash pipeline config
+    template:
+      src: config_files/pipeline/logstash.conf.j2
+      dest: /home/ubuntu/pipeline/logstash.conf
       owner: ubuntu
       group: ubuntu

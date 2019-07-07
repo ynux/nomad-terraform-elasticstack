@@ -1,0 +1,4 @@
+- name: beats role from elastic - restart doesn't work in 7.0.0
+  src: elastic.beats
+
+

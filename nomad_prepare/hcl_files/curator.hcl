@@ -1,5 +1,5 @@
 job "curator" {
-  datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
+  datacenters = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 
   type = "batch"
 
@@ -14,7 +14,7 @@ job "curator" {
 
     config {
       command = "/usr/bin/curator"
-      args = ["--config", "/home/ubuntu/curator/curator.yml", "/home/ubuntu/curator/action.yml","--dry-run"]
+      args    = ["--config", "/home/ubuntu/curator/curator.yml", "/home/ubuntu/curator/action.yml", "--dry-run"]
     }
 
     resources {
@@ -23,4 +23,3 @@ job "curator" {
     }
   }
 }
-
