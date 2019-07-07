@@ -1,4 +1,4 @@
---- 
+---
 - hosts: elasticsearch_nomad_clients
   become: true
   tasks:
@@ -28,7 +28,7 @@
       value: 65535
       comment: elasticsearch prod mode
     notify: reboot
-  - name: increase mmaps counts, https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html  
+  - name: increase mmaps counts, https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
     sysctl:
       name: vm.max_map_count
       value: 262144
@@ -40,4 +40,3 @@
         state: restarted
     - name: reboot
       reboot:
-

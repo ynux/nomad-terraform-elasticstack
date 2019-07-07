@@ -7,23 +7,22 @@
       name: elastic.beats
     vars:
       beat: filebeat
-      beat_conf: 
-        filebeat.inputs: 
+      beat_conf:
+        filebeat.inputs:
           - type: log
             enabled: true
             paths:
-              -  /var/log/*.log
-              -  /var/log/syslog
-              -  /var/log/supervisor/*.log
-              -  /var/log/elasticsearch/*.log
+              - /var/log/*.log
+              - /var/log/syslog
+              - /var/log/supervisor/*.log
+              - /var/log/elasticsearch/*.log
       logging_conf:
         level: info
         to_files: true
-        files: 
+        files:
           path: /var/log
           name: filebeat.log
           keepfiles: 7
-      output_conf: 
+      output_conf:
         logstash:
           hosts: ["logstash.service.consul:5044"]
-

@@ -3,7 +3,7 @@
 - hosts: nomad_clients
   become: true
   tasks:
-  - name: Add the key (already there because we installed filebeat, only for completeness) 
+  - name: Add the key (already there because we installed filebeat, only for completeness)
     apt_key:
       url: https://packages.elastic.co/GPG-KEY-elasticsearch
       state: present
@@ -16,7 +16,7 @@
     apt:
       name: ['elasticsearch-curator']
       state: present
-      update_cache: yes
+      update_cache: true
   - name: Put config files
     copy:
       src: curator_files/
@@ -44,4 +44,3 @@
       supervisorctl:
         name: nomad
         state: restarted
-

@@ -11,7 +11,7 @@
       in_interface: eth0
       protocol: tcp
       match: tcp
-      destination_port: 53 
+      destination_port: 53
       jump: REDIRECT
       to_ports: 8600
       comment: Redirect DNS queries to port 8600
@@ -22,7 +22,7 @@
       in_interface: eth0
       protocol: udp
       match: udp
-      destination_port: 53 
+      destination_port: 53
       jump: REDIRECT
       to_ports: 8600
       comment: Redirect DNS queries to port 8600
@@ -33,7 +33,7 @@
       protocol: tcp
       match: tcp
       destination: localhost
-      destination_port: 53 
+      destination_port: 53
       jump: REDIRECT
       to_ports: 8600
       comment: Redirect DNS queries to port 8600
@@ -44,7 +44,7 @@
       protocol: udp
       match: udp
       destination: localhost
-      destination_port: 53 
+      destination_port: 53
       jump: REDIRECT
       to_ports: 8600
       comment: Redirect DNS queries to port 8600
@@ -59,7 +59,6 @@
       path: /etc/resolvconf/resolv.conf.d/head
       line: nameserver 127.0.0.1
     notify: update resolvconf
-  handlers: 
+  handlers:
     - name: update resolvconf
       raw: resolvconf -u
-
