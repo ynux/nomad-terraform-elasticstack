@@ -12,10 +12,10 @@
       create: true
       dest: /home/ubuntu/etc_hosts.tpl
       block: |
-        "{% raw %}{{range services}}
+        {% raw %}{{range services}}
         # {{.Name}}{{range service .Name}} 
         {{.Address}} {{ .Name}}.service.consul 
-        {{end}} {{end}}{% endraw %}"
+        {{end}} {{end}}{% endraw %}
       owner: ubuntu
   - name: Create directory
     file:
@@ -26,7 +26,6 @@
     command: consul-template -template="etc_hosts.tpl:consul_template/output.txt" -once
     args:
       chdir: /home/ubuntu
-      creates: /home/ubuntu/consul_template/output.txt
   - name: Copy original /etc/hosts to /home/ubuntu
     copy:
       remote_src: true
