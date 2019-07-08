@@ -1,0 +1,34 @@
+---
+- hosts: nomad_clients
+  become: true
+  tasks:
+  - name: get consul-templates binaries
+    unarchive:
+      src: https://releases.hashicorp.com/consul-template/0.20.0/consul-template_0.20.0_linux_386.tgz
+      dest: /usr/local/bin
+      remote_src: true
+  - name: put template file
+    copy:
+      dest: /home/ubuntu/etc_hosts.tpl
+      content: "{% raw %}{{range services}}# {{.Name}}{{range service .Name}} {{.Address}} {{ .Name}}.service.consul {{end}} {{end}}{% endraw %}"
+      owner: ubuntu
+  - name: Create directory
+    file:
+      path: /home/ubuntu/consul_template
+      state: directory
+      owner: ubuntu
+  - name: Run consul-template
+    command: consul-template -template="etc_hosts.tpl:consul_template/output.txt" -once
+    args:
+      chdir: /home/ubuntu/consul_template
+      creates: /home/ubuntu/consul_template/output.txt
+  - name: Copy original /etc/hosts to /home/ubuntu
+    copy:
+      remote_src: true
+      src: /etc/hosts
+      dest: /home/ubuntu/consul_template
+      owner: ubuntu
+  - name: Create new /etc/hosts
+    assemble:
+      src: /home/ubuntu/consul_template
+      dest: /etc/hosts
