@@ -1,4 +1,4 @@
-job "elasticsearch_docker" {
+job "elasticsearch" {
   datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
   constraint {
     operator  = "distinct_hosts"
@@ -9,7 +9,7 @@ job "elasticsearch_docker" {
     value     = "elasticsearch"
   }
 
-  group "elasticsearch-group-docker" {
+  group "elasticsearch-group" {
     count = 3
     restart {
       attempts = 3
@@ -23,7 +23,7 @@ job "elasticsearch_docker" {
       unlimited = false
     }
 
-    task "run-elasticsearch-docker" {
+    task "run-elasticsearch" {
       driver = "docker"
       config {
         image = "docker.elastic.co/elasticsearch/elasticsearch-oss:7.2.0"
@@ -58,7 +58,7 @@ job "elasticsearch_docker" {
       }
 
       service {
-        name = "rest-elasticsearch-docker"
+        name = "rest-elasticsearch"
         port = "elasticsearch_rest"
         check {
           type     = "http"
@@ -69,7 +69,7 @@ job "elasticsearch_docker" {
       }
 
       service {
-        name = "intra-elasticsearch-docker"
+        name = "intra-elasticsearch"
         port = "elasticsearch_intra"
         check {
           type = "tcp"
