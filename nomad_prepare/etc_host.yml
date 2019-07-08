@@ -8,9 +8,14 @@
       dest: /usr/local/bin
       remote_src: true
   - name: put template file
-    copy:
+    blockinfile:
+      create: true
       dest: /home/ubuntu/etc_hosts.tpl
-      content: "{% raw %}{{range services}}# {{.Name}}{{range service .Name}} {{.Address}} {{ .Name}}.service.consul {{end}} {{end}}{% endraw %}"
+      block: |
+        "{% raw %}{{range services}}
+        # {{.Name}}{{range service .Name}} 
+        {{.Address}} {{ .Name}}.service.consul 
+        {{end}} {{end}}{% endraw %}"
       owner: ubuntu
   - name: Create directory
     file:
