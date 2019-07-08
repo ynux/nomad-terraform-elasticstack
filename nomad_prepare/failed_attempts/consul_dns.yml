@@ -1,0 +1,65 @@
+---
+# https://andydote.co.uk/2019/05/29/consul-dns-forwarding/
+# https://learn.hashicorp.com/consul/security-networking/forwarding#iptables-setup
+- hosts: nomad_clients
+  become: true
+  tasks:
+  - name: Have iptables forward DNS requests to consul (tcp)
+    iptables:
+      table: nat
+      chain: PREROUTING
+      in_interface: eth0
+      protocol: tcp
+      match: tcp
+      destination_port: 53
+      jump: REDIRECT
+      to_ports: 8600
+      comment: Redirect DNS queries to port 8600
+  - name: Have iptables forward DNS requests to consul (udp)
+    iptables:
+      table: nat
+      chain: PREROUTING
+      in_interface: eth0
+      protocol: udp
+      match: udp
+      destination_port: 53
+      jump: REDIRECT
+      to_ports: 8600
+      comment: Redirect DNS queries to port 8600
+  - name: Have iptables forward DNS requests to consul (tcp, local)
+    iptables:
+      table: nat
+      chain: OUTPUT
+      protocol: tcp
+      match: tcp
+      destination: localhost
+      destination_port: 53
+      jump: REDIRECT
+      to_ports: 8600
+      comment: Redirect DNS queries to port 8600
+  - name: Have iptables forward DNS requests to consul (udp, local)
+    iptables:
+      table: nat
+      chain: OUTPUT
+      protocol: udp
+      match: udp
+      destination: localhost
+      destination_port: 53
+      jump: REDIRECT
+      to_ports: 8600
+      comment: Redirect DNS queries to port 8600
+  - name: Have localhost resolve consul domain
+    blockinfile:
+      path: /etc/systemd/resolved.conf
+      block: |
+        DNS=127.0.0.1
+        Domains=~consul
+  - name: Do some weird stuff so resolv.conf will update
+    lineinfile:
+      path: /etc/resolvconf/resolv.conf.d/head
+      line: nameserver 127.0.0.1
+    notify:
+      - update resolvconf
+  handlers:
+    - name: update resolvconf
+      raw: resolvconf -u
