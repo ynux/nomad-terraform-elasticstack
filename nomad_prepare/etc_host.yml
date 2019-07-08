@@ -25,7 +25,7 @@
   - name: Run consul-template
     command: consul-template -template="etc_hosts.tpl:consul_template/output.txt" -once
     args:
-      chdir: /home/ubuntu/consul_template
+      chdir: /home/ubuntu
       creates: /home/ubuntu/consul_template/output.txt
   - name: Copy original /etc/hosts to /home/ubuntu
     copy:
