@@ -1,5 +1,7 @@
 [nomad_clients]
 nnn.nnn.nnn.nnn
+[nomad_clients:vars]
+es_first=es1.nnn.nnn.private
 
 [nomad_clients:children]
 elasticsearch_nomad_clients
