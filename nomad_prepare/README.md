@@ -1,23 +1,21 @@
 ### Prepare the Nomad Cluster
 
-ansible 2.8.1
+Using ansible 2.8.1
 
 Before we can really start the nomad jobs, the cluster needs [task drivers](https://www.nomadproject.io/docs/drivers/index.html) on client nodes, some system settings, some software and some files.
 
 For the Elastic Stack components, this means:
 * elasticsearch: docker, plus some system prereqs and a data directory
 * kibana, logstash: docker, plus pipeline config
-* curator: exec, periodic job, config, and chroot change
+* curator: binaries, config, and chroot change
 * filebeat installed directly, not under nomad control, install on nomad clients and servers
 * connect services with consul dns
 
-
 Remarks:
-* I'm not really attaching volumes to the elasticsearch servers
+* I'm not really attaching volumes to the elasticsearch servers - not persistent, not for production.
 * We pin 3 elasticsearch nodes to 3 nomad nodes (job constraint)
 * We deploy only 1 logstash instance 
-* For a real life setup, if you want to see the logs when the nomad cluster is gone, install a second filebeat instance to send them to another elastic stack
-* Consul DNS works fine - outside the containers. For now, I put hardcoded IPs into the configurations used by dockered services (in config and hcl files)
+* For a real life setup, you may want to be able to see your logs even when your nomad cluster is gone. In this case, install a second filebeat instance to send them to another elastic stack
 
 #### Prepare ansible
 
@@ -30,22 +28,21 @@ Put 3 client nodes into the nomad\_clients\_elasticsearch group.
 Put the path to your key into your [ansible.cfg](./ansible.cfg.example).
 install elastic's beats ansible role with `ansible-galaxy install -r requirements.yml`
 
-Check your setup with `ansible all -m ping`
-Note to self: If you wonder about the path where the role is installed, run `ansible-galaxy info elastic.beats`.) And the role is not great, e.g. restart when config file changes is broken.
+##### Put one private IP into inventory.ini
 
-#### Put IP into config and hcl files
+Elasticsearch needs a `cluster.initial_master_nodes` for the initial bootstrap, and some `discovery.seed_hosts` to have the nodes discover each other. For the latter we could install the aws discovery plugin. For the first I'm not sure how to solve it. It has to be same, otherwise you might end up with three clusters.
 
-Unfortunately, i couldn't make consul dns work in the containers. Also, i didn't manage to automatically fill the master ip in the elasticsearch environment. For now, please do it manually:
-* get the private IP of one of the elasticserch instance
-* get another private elasticsearch IP for logstash 
-```
-sed 's/$ES_FIRST_IP/172.31.41.218/' hcl_files/kibana.hcl.tpl > hcl_files/kibana.hcl
-sed 's/$ES_FIRST_IP/172.31.41.218/' hcl_files/elasticsearch_docker.hcl.tpl > hcl_files/elasticsearch_docker.hcl
-sed 's/$ES_OTHER_IP/172.31.27.73/' config_files/pipeline/logstash.conf.tpl > config_files/pipeline/logstash.conf
-```
-#### Run Playbooks and Check Setup
+It would be elegant to have the nodes register with consul and then extract information about each other from consul. However, this brings dependencies into the game, and formatting issues which i was worried could keep me busy for longer than i care for. 
+
+So I took the cheap way out: Put one elasticsearch internal IP and use it via ansible templates. It works. 
+
+So please get one elasticsearch private IP , e.g. with `aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].[PublicIpAddress,PrivateIpAddress]" --output table`. Put it as `es_first` variable into the inventory.ini.
+
+#### Run Playbooks
 
 ```
+# Test if nodes are reachable
+ansible all -m ping
 # install filebeat on all instances
 ansible-playbook filebeat.yml
 # Install docker on all nomad client nodes
@@ -62,13 +59,27 @@ ansible-playbook copy_files.yml
 ### Very few checks - I should do more
 ansible-playbook check_nomad_clients.yml
 ```
-#### Result
+#### A note on name resolution
 
-The consul service should be visible:
+The components have to find one another:
+* Beats has to find Logstash
+* Logstash has to find Elasticsearch
+* Elasticsearch has to find each other - we use one private IP for this
+* Kibana has to find Elasticsearch
+* Curator has to find Elasticsearch 
+
+Consul will register the services and the IPs, but no one will know that they should look up `*.service.consul` at localhost port 8600.
+
 `dig @<consul server> -p 8600 rest-elasticsearch-docker.service.consul. ANY`
 `dig @localhost service-kibana.service.consul. ANY`
 
-There should be GUIs reachable from everywhere at `<nomad_consul_server>:4646` `<nomad_consul_server>:8500`
+How to integrate Consul DNS with your existing DNS depends on your existing DNS.
+
+In my case, the AMI seemed to have a very basic setup that I didn't want to mess with. So I went for putting the services into `/etc/hosts`. This is not a great solution, just enough to get the demo working. 
+
+#### Result
+
+We now have everything in place to start our jobs on nomad. Proceed to [nomad\_action](../nomad_action)
 
 #### Random Remarks
 To show that we aren't scared of go templates:
@@ -85,7 +96,6 @@ To see that elastic isn't scared of new java versions:
 Check consul services:
 `curl http://127.0.0.1:8500/v1/catalog/service/intra-elasticsearch | json_pp`
 
-`aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].[PublicIpAddress,PrivateIpAddress]" --output table`
 
 consul template to return one elasticsearch IP:
 ```

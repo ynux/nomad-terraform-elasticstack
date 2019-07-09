@@ -13,7 +13,7 @@ job "kibana" {
     }
 
     env {
-       "ELASTICSEARCH_HOSTS" = "http://{{ es_first }}:9200"
+       "ELASTICSEARCH_HOSTS" = "http://rest-elasticsearch.service.consul:9200"
     }
 
     resources {
