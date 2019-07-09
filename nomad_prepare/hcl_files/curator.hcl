@@ -14,7 +14,7 @@ job "curator" {
 
     config {
       command = "/usr/bin/curator"
-      args    = ["--config", "/home/ubuntu/curator/curator.yml", "/home/ubuntu/curator/action.yml", "--dry-run"]
+      args    = ["--config", "/opt/elasticsearch-curator/curator.yml", "/opt/elasticsearch-curator/action.yml", "--dry-run"]
     }
 
     resources {
