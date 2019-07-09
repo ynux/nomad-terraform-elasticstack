@@ -38,6 +38,30 @@ nomad run curator.hcl
 ```
 Curator is a bit more fun, being a periodic and exec job. Note how we had to change the chroot in the nomad client config to make this work. Feel free to schedule the job so that you can see it running.
  
+#### Add Consul Services to /etc/hosts
+
+The services won't find each other yet. Please go back to [nomad\_prepare](../nomad_prepare) and run 
+```
+ansible-playbook etc_hosts.yml
+```
+
+#### Result
+Find the public IP of your Kibana instance, e.g. with:
+```
+# on ec2 instance:
+nomad status kibana
+# returns node id
+nomad node status -verbose | grep <node id>
+# returns private ip
+# on your laptop:
+aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].[PublicIpAddress,PrivateIpAddress]" --output table
+# returns public ip
+# in browser, open http://<public kibana ip>:5601
+```
+There you should be able to create an index pattern and see logs flowing in.
+
+This is how far this demo goes. In a real setup, the serious work would start here.
+
 #### What comes then?
 
 * fix mapping of elasticsearch - e.g. `agent.hostname` should be a keyword
