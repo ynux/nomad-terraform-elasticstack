@@ -57,7 +57,11 @@ terraform apply
 
 #### Have a Look
 
-Get the public IPs of your nomad servers in the AWS console or with `aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text`. Ssh to them as ubuntu, and run (Nomad v0.9.3, Consul v1.5.1):
+Get the public IPs of your nomad servers in the AWS console or with `aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text`. 
+
+There should be GUIs reachable from everywhere at `<nomad_consul_server>:4646` (nomad) and  `<nomad_consul_server>:8500` (consul)
+
+Alternatively, ssh to some node as user ubuntu, and run (Nomad v0.9.3, Consul v1.5.2):
  
 ```
 consul members
@@ -65,6 +69,5 @@ nomad server members
 nomad node status
 ```
 If all this comes back nicely, proceed to [preparing the nomad cluster](../nomad_prepare)
-Or connect to the GUIs of nomad and elasticsearch from outside, using a server's IP and ports 4646 or 8500 respectively.
 
 
