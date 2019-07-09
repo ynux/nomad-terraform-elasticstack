@@ -36,3 +36,8 @@
     assemble:
       src: /home/ubuntu/consul_template
       dest: /etc/hosts
+    notify: docker restart
+  handlers:
+    name: docker restart
+    service: docker
+      state: restarted
