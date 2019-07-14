@@ -1,5 +1,5 @@
 job "kibana" {
-  datacenters = ["eu-central-1a","eu-central-1b","eu-central-1c"]
+  datacenters = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
 
   task "run-kibana" {
     driver = "docker"
@@ -7,13 +7,17 @@ job "kibana" {
     config {
       image = "docker.elastic.co/kibana/kibana-oss:7.2.0"
 
+      volumes = [
+        "/etc/hosts:/etc/hosts",
+      ]
+
       port_map {
         kibana_http = 5601
       }
     }
 
     env {
-       "ELASTICSEARCH_HOSTS" = "http://rest-elasticsearch.service.consul:9200"
+      "ELASTICSEARCH_HOSTS" = "http://rest-elasticsearch.service.consul:9200"
     }
 
     resources {
