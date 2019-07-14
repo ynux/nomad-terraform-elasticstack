@@ -37,6 +37,7 @@
       dest: /etc/hosts
     notify: docker restart
   handlers:
-    name: docker restart
-    service: docker
-      state: restarted
+    - name: docker restart
+      service: 
+        name: docker
+        state: restarted
