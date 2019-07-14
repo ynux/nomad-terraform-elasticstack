@@ -46,7 +46,7 @@ consul catalog services
 #rest-elasticsearch
 #service-kibana
 ```
-Now is a good time to put the IPs of those services into `/etc/hosts`, which is our very basic way of integrating the Consul DNS with the existing DNS. In production, you'll want something more dynamic. This "solution" here means that you have to rerun it every time e.g. logstash moves to another node. 
+Now is a good time to put the IPs of those services into `/etc/hosts`, which is our very basic way of integrating the Consul DNS with the existing DNS. In production, you'll want something more dynamic. This "solution" here means that you have to rerun it every time e.g. logstash moves to another node. You could run consul-template as a daemon, for example.	
 Go back to `nomad_prepare`, and run
 ```
 ansible-playbook etc_hosts.yml
