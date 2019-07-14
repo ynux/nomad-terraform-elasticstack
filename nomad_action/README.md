@@ -32,6 +32,24 @@ Get the external ip, e.g. by noting the node id, getting the internal ip with `n
 nomad run logstash.hcl
 ```
 This should start the flow of events. Logstash takes some time to start, check the logs. When it's there, a new index should appear. If it doesn't ... Try restarting filebeat. Doublecheck the elasticsearch IP in the pipeline config.
+#### Consul DNS
+
+Now the consul services should be there, check with 
+```
+consul catalog services
+# should come back with something like
+#consul
+#intra-elasticsearch
+#logstash
+#nomad
+#nomad-client
+#rest-elasticsearch
+#service-kibana
+```
+Now is a good time to put the IPs of those services into `/etc/hosts`, which is our very basic way of integrating the Consul DNS with the existing DNS. In production, you'll want something more dynamic. Go back to `nomad_prepare`, and run
+```
+ansible-playbook etc_hosts.yml
+```
 #### Curator
 ```
 nomad run curator.hcl
