@@ -9,6 +9,7 @@ job "logstash" {
 
       volumes = [
         "/home/ubuntu/pipeline/:/usr/share/logstash/pipeline/",
+        "/etc/hosts:/etc/hosts",
       ]
     }
 
