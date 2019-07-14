@@ -17,15 +17,14 @@
       owner: ubuntu
       group: ubuntu
     loop: 
-      - elasticsearch_docker.hcl
-      - kibana.hcl
+      - elasticsearch.hcl
   - name: Create pipeline config dir for logstash
     file: 
       path: /home/ubuntu/pipeline
       state: directory
   - name: Logstash pipeline config
-    template:
-      src: config_files/pipeline/logstash.conf.j2
+    copy:
+      src: config_files/pipeline/logstash.conf
       dest: /home/ubuntu/pipeline/logstash.conf
       owner: ubuntu
       group: ubuntu
