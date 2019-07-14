@@ -2,20 +2,21 @@
 
 Using ansible 2.8.1
 
-Before we can really start the nomad jobs, the cluster needs [task drivers](https://www.nomadproject.io/docs/drivers/index.html) on client nodes, some system settings, some software and some files.
+Before we can start the nomad jobs, the cluster needs [task drivers](https://www.nomadproject.io/docs/drivers/index.html) on client nodes, some system settings, some software and some files.
 
-For the Elastic Stack components, this means:
+For the Elastic Stack components, this means that the nodes need:
 * elasticsearch: docker, plus some system prereqs and a data directory
-* kibana, logstash: docker, plus pipeline config
-* curator: binaries, config, and chroot change
-* filebeat installed directly, not under nomad control, install on nomad clients and servers
-* connect services with consul dns
+* kibana, logstash: docker, plus pipeline config for logstash
+* curator: binaries, config, and chroot change in the nomad config
+* filebeat will be installed directly, not under nomad control, install on nomad clients and servers
+* and we have to integrate the consul dns if we want to use the service names
 
 Remarks:
 * I'm not really attaching volumes to the elasticsearch servers - not persistent, not for production.
 * We pin 3 elasticsearch nodes to 3 nomad nodes (job constraint)
 * We deploy only 1 logstash instance 
 * For a real life setup, you may want to be able to see your logs even when your nomad cluster is gone. In this case, install a second filebeat instance to send them to another elastic stack
+* The playbooks copy the Nomad Job Definitions (hcl-files) to all nomad nodes, this is just for convenience (nomad installed, everything accessible, quick troubleshooting)
 
 #### Prepare ansible
 
@@ -24,17 +25,15 @@ Populate your [inventory.ini](./inventory.ini) with the public IPs of your ec2 i
 aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text
 aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].PublicIpAddress" --output text
 ```
-Put 3 client nodes into the nomad\_clients\_elasticsearch group.
+Put 3 client nodes into the nomad\_clients\_elasticsearch group, the fourth in the nomad\_client group of your inventory.ini.
 Put the path to your key into your [ansible.cfg](./ansible.cfg.example).
-install elastic's beats ansible role with `ansible-galaxy install -r requirements.yml`
+Install elastic's beats ansible role with `ansible-galaxy install -r requirements.yml`
 
 ##### Put one private IP into inventory.ini
 
 Elasticsearch needs a `cluster.initial_master_nodes` for the initial bootstrap, and some `discovery.seed_hosts` to have the nodes discover each other. For the latter we could install the aws discovery plugin. For the first I'm not sure how to solve it. It has to be same, otherwise you might end up with three clusters.
 
-It would be elegant to have the nodes register with consul and then extract information about each other from consul. However, this brings dependencies into the game, and formatting issues which i was worried could keep me busy for longer than i care for. 
-
-So I took the cheap way out: Put one elasticsearch internal IP and use it via ansible templates. It works. 
+I took the cheap way out: Put one elasticsearch internal IP and use it via ansible templates. It works. 
 
 So please get one elasticsearch private IP , e.g. with `aws ec2 describe-instances --filter "Name=tag:Name,Values=nomad-example-client" --query "Reservations[*].Instances[*].[PublicIpAddress,PrivateIpAddress]" --output table`. Put it as `es_first` variable into the inventory.ini.
 
