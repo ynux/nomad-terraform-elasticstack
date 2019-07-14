@@ -46,7 +46,8 @@ consul catalog services
 #rest-elasticsearch
 #service-kibana
 ```
-Now is a good time to put the IPs of those services into `/etc/hosts`, which is our very basic way of integrating the Consul DNS with the existing DNS. In production, you'll want something more dynamic. Go back to `nomad_prepare`, and run
+Now is a good time to put the IPs of those services into `/etc/hosts`, which is our very basic way of integrating the Consul DNS with the existing DNS. In production, you'll want something more dynamic. This "solution" here means that you have to rerun it every time e.g. logstash moves to another node. 
+Go back to `nomad_prepare`, and run
 ```
 ansible-playbook etc_hosts.yml
 ```
@@ -82,7 +83,12 @@ This is how far this demo goes. In a real setup, the serious work would start he
 
 #### What comes then?
 
-* fix mapping of elasticsearch - e.g. `agent.hostname` should be a keyword
-* create visualizations
-* make sure you get all logs, also those eaten by nomad
+Cleanup! Go to your terraform-nomad directory and run `terraform destroy`. Also, remove the baked AMI.
+
+If this wasn't demo but real:
+* elasticsearch: fix mapping - e.g. `agent.hostname` should be a keyword
+* kibana: create visualizations
+* filebeat: make sure you get all logs, also those of the containers run by nomad
+* fix the DNS-Consul connection
+* establish monitoring and so on and so forth
 * and generally, be kind with each other & save the world
