@@ -10,7 +10,7 @@
   - name: put template file
     blockinfile:
       create: true
-      dest: /home/ubuntu/etc_hosts.tpl
+      path: /home/ubuntu/etc_hosts.tpl
       block: |
         {% raw %}{{range services}}
         # {{.Name}}{{range service .Name}} 
@@ -28,6 +28,7 @@
   - name: Remove old block from /etc/hosts
     blockinfile:
       state: absent
+      path: /etc/hosts
   - name: Copy original /etc/hosts to /home/ubuntu
     copy:
       remote_src: true
@@ -38,9 +39,3 @@
     assemble:
       src: /home/ubuntu/consul_template
       dest: /etc/hosts
-    notify: docker restart
-  handlers:
-    - name: docker restart
-      service: 
-        name: docker
-        state: restarted
