@@ -51,7 +51,7 @@ ansible-playbook curator.yml
 # Assign node class "elasticsearch", prepare OS, create data dir
 ansible-playbook elasticsearch_nomad_clients.yml
 # Integrate consul into DNS
-ansible-playbook etc_hosts.yml
+ansible-playbook etc_host.yml
 # Copy config and nomad job definition files to all client nodes
 ansible-playbook copy_files.yml
 
@@ -67,7 +67,7 @@ The components have to find one another:
 * Kibana has to find Elasticsearch
 * Curator has to find Elasticsearch 
 
-Consul will register the services and the IPs, but no one will know that they should look up `*.service.consul` at localhost port 8600.
+Once the nomad jobs are created in the next part, Consul will register the services and the IPs, but no one will know that they should look up `*.service.consul` at localhost port 8600.
 
 `dig @<consul server> -p 8600 rest-elasticsearch-docker.service.consul. ANY`
 `dig @localhost service-kibana.service.consul. ANY`
