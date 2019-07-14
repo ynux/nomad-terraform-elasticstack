@@ -25,6 +25,9 @@
     command: consul-template -template="etc_hosts.tpl:consul_template/output.txt" -once
     args:
       chdir: /home/ubuntu
+  - name: Remove old block from /etc/hosts
+    blockinfile:
+      state: absent
   - name: Copy original /etc/hosts to /home/ubuntu
     copy:
       remote_src: true
