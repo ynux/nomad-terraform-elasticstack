@@ -14,8 +14,7 @@
       block: |
         {% raw %}{{range services}}
         # {{.Name}}{{range service .Name}} 
-        {{.Address}} {{ .Name}}.service.consul 
-        {{end}} {{end}}{% endraw %}
+        {{.Address}} {{ .Name}}.service.consul {{end}} {{end}}{% endraw %}
       owner: ubuntu
   - name: Create directory
     file:

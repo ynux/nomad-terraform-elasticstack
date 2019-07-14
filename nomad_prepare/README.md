@@ -51,7 +51,7 @@ ansible-playbook curator.yml
 # Assign node class "elasticsearch", prepare OS, create data dir
 ansible-playbook elasticsearch_nomad_clients.yml
 # Integrate consul into DNS
-ansible-playbook consul_dns.yml
+ansible-playbook etc_hosts.yml
 # Copy config and nomad job definition files to all client nodes
 ansible-playbook copy_files.yml
 
