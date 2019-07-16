@@ -1,5 +1,4 @@
-# Create an Elastic Stack on Nomad, for Nomad; with SearchGuard
-
+# Create an Elastic Stack on Nomad, for Nomad
 for the Search Meetup in Munich, July 2019
 
 This is a demo setup. Not for production, not for complete automation - i intentionally do steps manually where i want to show the system.
